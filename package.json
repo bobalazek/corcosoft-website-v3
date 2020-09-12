@@ -5,7 +5,7 @@
         "start": "webpack-dev-server --config webpack.dev.js --inline --progress",
         "build": "webpack --config webpack.prod.js --progress"
     },
-    "devDependencies": {
+    "dependencies": {
         "bootstrap": "^4.5.2",
         "copy-webpack-plugin": "^6.1.0",
         "css-loader": "^4.3.0",
