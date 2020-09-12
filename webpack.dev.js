@@ -7,16 +7,17 @@ module.exports = merge(common, {
   mode: 'development',
   devtool: 'inline-source-map',
   watch: true,
+  /*
+  // only if it's in a docker container
   watchOptions: {
     poll: 250,
     ignored: ['node_modules/**'],
   },
+  */
   devServer: {
-    contentBase: path.resolve(__dirname, 'dist'),
-    port: 8080,
-    host: '0.0.0.0',
+    watchContentBase: true,
+    open: true,
     hot: true,
-    sockPort: 8080,
-    sockHost: 'localhost',
+    // host: '0.0.0.0', // only if it's in a docker container
   },
 });
