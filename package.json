@@ -6,12 +6,15 @@
         "build": "webpack --config webpack.prod.js --progress"
     },
     "dependencies": {
+        "autoprefixer": "^9.8.6",
         "bootstrap": "^4.5.2",
         "copy-webpack-plugin": "^6.1.0",
         "css-loader": "^4.3.0",
         "html-webpack-plugin": "^4.4.1",
         "mini-css-extract-plugin": "^0.11.1",
         "popper.js": "^1.16.1",
+        "postcss": "^7.0.32",
+        "postcss-loader": "^4.0.1",
         "sass": "^1.26.10",
         "sass-loader": "^10.0.2",
         "style-loader": "^1.2.1",
@@ -23,5 +26,11 @@
         "webpack-cli": "^3.3.12",
         "webpack-dev-server": "^3.11.0",
         "webpack-merge": "^5.1.4"
-    }
+    },
+    "browserslist": [
+      "> 1%",
+      "last 2 versions",
+      "Firefox ESR",
+      "not dead"
+    ]
 }

@@ -1,14 +1,10 @@
 /***** Dependencies *****/
-// Bootstrap
+/* Bootstrap */
 @import "~bootstrap/scss/bootstrap";
 
 /***** General *****/
 body {
   background-color: #fafafa;
-}
-
-header {
-  margin-top: 1.5em;
 }
 
 b {
@@ -29,6 +25,12 @@ ul li:last-child {
   margin-bottom: 0;
 }
 
+/*** Header ***/
+header {
+  margin-top: 1.5em;
+}
+
+/*** Footer ***/
 footer {
   color: #999;
 }
