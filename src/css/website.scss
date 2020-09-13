@@ -1,6 +1,7 @@
 /***** Dependencies *****/
 /* Bootstrap */
 @import "~bootstrap/scss/bootstrap";
+@import "~animate.css";
 
 /***** General *****/
 body {
@@ -23,6 +24,16 @@ ul li {
 
 ul li:last-child {
   margin-bottom: 0;
+}
+
+/*** Content ***/
+[data-animation] {
+  visibility: hidden;
+}
+
+h1 span,
+h2 span {
+  display: inline-block;
 }
 
 /*** Header ***/
