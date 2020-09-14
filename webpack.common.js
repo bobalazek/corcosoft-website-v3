@@ -4,27 +4,32 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const ManifestPlugin = require('webpack-manifest-plugin');
 const Autoprefixer = require('autoprefixer');
 
 module.exports = {
   entry: {
-    app: path.resolve(__dirname, 'src', 'index.ts'),
+    main: path.resolve(__dirname, 'src', 'index.ts'),
   },
   output: {
-    filename: '[name].[hash].js',
-    path: path.resolve(__dirname, 'dist'),
+    filename: 'static/js/[name].[hash].js',
+    chunkFilename: 'static/js/[name].chunk.js',
+    path: path.resolve(__dirname, 'build'),
   },
   devtool: 'source-map',
   context: __dirname,
   plugins: [
-    new MiniCssExtractPlugin(),
+    new MiniCssExtractPlugin({
+      filename: 'static/css/[name].[contenthash].css',
+      chunkFilename: 'static/css/[name].[contenthash].chunk.css',
+    }),
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, 'src', 'static', 'index.html'),
+      template: path.resolve(__dirname, 'src', 'public', 'index.html'),
     }),
     new CopyWebpackPlugin({
       patterns: [
         {
-          from: path.resolve(__dirname, 'src', 'static'),
+          from: path.resolve(__dirname, 'src', 'public'),
           to: './',
           globOptions: {
             ignore: [
@@ -34,13 +39,14 @@ module.exports = {
         },
       ],
     }),
+    new ManifestPlugin(),
   ],
   module: {
     rules: [
       {
         test: /\.tsx?$/,
         loader: 'ts-loader',
-        exclude: /node_modules/
+        exclude: /node_modules/,
       },
       {
         test: /\.s[ac]ss$/i,
@@ -58,8 +64,5 @@ module.exports = {
     splitChunks: {
       chunks: 'all',
     },
-  },
-  node: {
-    fs: 'empty',
   },
 }

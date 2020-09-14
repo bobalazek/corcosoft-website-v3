@@ -1,7 +1,7 @@
 import jQuery from 'jquery';
 
 // CSS
-import './css/website.scss';
+import './css/main.scss';
 
 // jQuery
 jQuery(document).ready(function($) {

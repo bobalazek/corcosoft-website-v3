@@ -7,9 +7,9 @@
 
 ## Development
 
-* Run: `yarn run start`
+* Run: `yarn start`
 
 
 ## Build
 
-* Run: `yarn run build`
+* Run: `yarn build`
