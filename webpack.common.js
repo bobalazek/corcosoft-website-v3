@@ -5,7 +5,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
-const Autoprefixer = require('autoprefixer');
 
 module.exports = {
   entry: {
@@ -46,16 +45,42 @@ module.exports = {
       {
         test: /\.tsx?$/,
         loader: 'ts-loader',
+        options: {
+          compilerOptions: {
+            sourceMap: true,
+            esModuleInterop: true,
+          },
+        },
         exclude: /node_modules/,
       },
       {
         test: /\.s[ac]ss$/i,
         use: [
-          MiniCssExtractPlugin.loader,
-          // 'style-loader', // not working together with MiniCssExtractPlugin
-          'css-loader',
-          'postcss-loader',
-          'sass-loader',
+          {
+            loader: MiniCssExtractPlugin.loader,
+          },
+          // In case you want inline styles
+          /*
+          {
+            loader: 'style-loader',
+          },
+          */
+          {
+            loader: 'css-loader',
+          },
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [
+                  require('autoprefixer'),
+                ],
+              },
+            },
+          },
+          {
+            loader: 'sass-loader',
+          },
         ],
       },
     ]
