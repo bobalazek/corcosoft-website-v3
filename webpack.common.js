@@ -38,7 +38,20 @@ module.exports = {
         },
       ],
     }),
-    new ManifestPlugin(),
+    new ManifestPlugin({
+      fileName: 'asset-manifest.json',
+      generate: (seed, files, entrypoints) => {
+        return {
+          files: files.reduce((manifest, file) => {
+            manifest[file.name] = file.path;
+            return manifest;
+          }, seed),
+          entrypoints: entrypoints.main.filter(
+            fileName => !fileName.endsWith('.map')
+          ),
+        };
+      },
+    }),
   ],
   module: {
     rules: [
