@@ -18,6 +18,8 @@ module.exports = merge(common, {
     watchContentBase: true,
     open: true,
     hot: true,
+    compress: true,
+    transportMode: 'ws',
     // host: '0.0.0.0', // only if it's in a docker container
   },
 });
