@@ -23,12 +23,12 @@ module.exports = {
       chunkFilename: 'static/css/[name].[contenthash].chunk.css',
     }),
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, 'src', 'public', 'index.html'),
+      template: path.resolve(__dirname, 'public', 'index.html'),
     }),
     new CopyWebpackPlugin({
       patterns: [
         {
-          from: path.resolve(__dirname, 'src', 'public'),
+          from: path.resolve(__dirname, 'public'),
           to: './',
           globOptions: {
             ignore: [
