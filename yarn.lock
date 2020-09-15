@@ -503,23 +503,23 @@ autoprefixer@^9.8.6:
     postcss "^7.0.32"
     postcss-value-parser "^4.1.0"
 
-babylonjs-gltf2interface@4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/babylonjs-gltf2interface/-/babylonjs-gltf2interface-4.1.0.tgz#95ec994e352ac5cb74869e238218a1b4df18e2f4"
-  integrity sha512-H2obg+4t8bcmLyzGiOQqmUaTQqTu+6mJUlsMWZvmRBf0k2fQVeTdAkH7aDy6HVIz/THvpIx4ntG1Lsyquvmc5Q==
+babylonjs-gltf2interface@4.2.0-beta.3:
+  version "4.2.0-beta.3"
+  resolved "https://registry.yarnpkg.com/babylonjs-gltf2interface/-/babylonjs-gltf2interface-4.2.0-beta.3.tgz#c3365bdb554839ca11781853b553fca75cd4985e"
+  integrity sha512-1PkYqqhrtPUz4xcKqN5ANcyg1Yv/VnL/TUmE5tEOPj2VnYRH0UhsMVGq/N2UtIRaTa/eC0GbunYiPBF1uruxEQ==
 
-babylonjs-loaders@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/babylonjs-loaders/-/babylonjs-loaders-4.1.0.tgz#b056423b98c1e3a3962491ec72dce5e0b8852295"
-  integrity sha512-gNC+XEVI5cLJLVRTlkFHVfSY4EZS0VzWzEmNb8M49ZMFNuqOuHsVnQZg4Vms9e4LgvNtws4Z0SWrRanZnkIX5g==
+babylonjs-loaders@^4.2.0-beta.3:
+  version "4.2.0-beta.3"
+  resolved "https://registry.yarnpkg.com/babylonjs-loaders/-/babylonjs-loaders-4.2.0-beta.3.tgz#2ea80bc37a13d797c2ce2883b89bdf9bd68d8ff4"
+  integrity sha512-IEmKQ6ugh7lSo6MwaHxtfjPQzNblqebqMyPEsEEG/+dG5fHKsvjjHeZD79XD/GsjtEX+H7c4Sjw6yPrQXC90OA==
   dependencies:
-    babylonjs "4.1.0"
-    babylonjs-gltf2interface "4.1.0"
+    babylonjs "4.2.0-beta.3"
+    babylonjs-gltf2interface "4.2.0-beta.3"
 
-babylonjs@4.1.0, babylonjs@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/babylonjs/-/babylonjs-4.1.0.tgz#a2d1d6765795e9d44f002831554d63d6275394bd"
-  integrity sha512-MnaH1BQIL+PYgqGaAvGVdP8yd7nM1j6sbQi/K/6+RlkHPxIETW2NbjqxiW7Sywgy7r3PwqWT/gxG4Bz95Z6/yA==
+babylonjs@4.2.0-beta.3, babylonjs@^4.2.0-beta.3:
+  version "4.2.0-beta.3"
+  resolved "https://registry.yarnpkg.com/babylonjs/-/babylonjs-4.2.0-beta.3.tgz#42a92370010e3d9a9caa5e354988b26a9b15a64b"
+  integrity sha512-frAhL3uM3NgLIe4ss9IcTWXRMhcsD9+W/AGddn1MTbp6EFv8Mrs1H5xC7Cq1Ek09LgRgiq15C9MIoelivR1fPA==
 
 balanced-match@^1.0.0:
   version "1.0.0"

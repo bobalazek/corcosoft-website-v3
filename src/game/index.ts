@@ -2,15 +2,17 @@ import {
   Engine,
   Scene,
   UniversalCamera,
-  HemisphericLight,
   MeshBuilder,
-  Matrix,
+  PBRMetallicRoughnessMaterial,
+  CubeTexture,
+  SceneLoader,
   Vector3,
   Color4,
 } from 'babylonjs';
 
 // Constants
 const CAMERA_DISTANCE = 15;
+const CHARACTER_POSITION_SMOOOTHING = 0.002;
 
 // CSS
 import './css/index.scss';
@@ -26,6 +28,15 @@ const engine = new Engine(
 let scene = new Scene(engine);
 scene.clearColor = new Color4(0, 0, 0, 0);
 
+var environmentTexture = CubeTexture.CreateFromPrefilteredData(
+  'static/media/textures/environment.dds',
+  scene
+);
+scene.environmentTexture = environmentTexture;
+
+//scene.debugLayer.show({ overlay: true });
+
+// Game - Scene - Camera
 let camera = new UniversalCamera(
   'camera',
   new Vector3(0, 0, -CAMERA_DISTANCE),
@@ -33,12 +44,15 @@ let camera = new UniversalCamera(
 );
 camera.lockedTarget = new Vector3(0, 0, 0);
 
-let light = new HemisphericLight(
-  'light',
-  new Vector3(0, 1, 0),
+// Game - Scene - Character
+let characterMaterial = new PBRMetallicRoughnessMaterial(
+  'characterMaterial',
   scene
 );
+characterMaterial.environmentTexture = environmentTexture;
 
+let character = null;
+/*
 let character = MeshBuilder.CreateSphere(
   'sphere',
   {
@@ -46,19 +60,30 @@ let character = MeshBuilder.CreateSphere(
   },
   scene
 );
+character.material = characterMaterial;
+*/
 
-character.metadata = {
-  finalPosition: new Vector3(),
-};
+let characterFinalPosition = new Vector3();
+
+SceneLoader.LoadAssetContainer('/static/media/models/', 'bot.glb', scene, function (container) {
+  console.log(container)
+  let botMesh = container.scene.meshes[0];
+
+  scene.addMesh(botMesh);
+
+  botMesh.position = characterFinalPosition;
+});
 
 // Game - Render loop
 engine.runRenderLoop(() => {
   // Character movement
-  character.position = Vector3.Lerp(
-    character.position,
-    character.metadata.finalPosition,
-    engine.getDeltaTime() * 0.005
-  );
+  if (character) {
+    character.position = Vector3.Lerp(
+      character.position,
+      characterFinalPosition,
+      engine.getDeltaTime() * CHARACTER_POSITION_SMOOOTHING
+    );
+  }
 
   // Render
   scene.render();
@@ -71,7 +96,7 @@ window.addEventListener('resize', () => {
 
 window.addEventListener('mousemove', (e) => {
   const pickResult = scene.pick(e.clientX, e.clientY);
-  character.metadata.finalPosition = new Vector3(
+  characterFinalPosition = new Vector3(
     pickResult.ray.origin.x + pickResult.ray.direction.x * CAMERA_DISTANCE,
     pickResult.ray.origin.y + pickResult.ray.direction.y * CAMERA_DISTANCE,
     pickResult.ray.origin.z + pickResult.ray.direction.z * CAMERA_DISTANCE
