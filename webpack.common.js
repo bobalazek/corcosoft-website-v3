@@ -11,7 +11,7 @@ module.exports = {
     main: path.resolve(__dirname, 'src', 'index.ts'),
   },
   output: {
-    filename: 'static/js/[name].[hash].js',
+    filename: 'static/js/[name].[hash:8].js',
     chunkFilename: 'static/js/[name].chunk.js',
     path: path.resolve(__dirname, 'build'),
   },
@@ -19,8 +19,8 @@ module.exports = {
   context: __dirname,
   plugins: [
     new MiniCssExtractPlugin({
-      filename: 'static/css/[name].[contenthash].css',
-      chunkFilename: 'static/css/[name].[contenthash].chunk.css',
+      filename: 'static/css/[name].[contenthash:8].css',
+      chunkFilename: 'static/css/[name].[contenthash:8].chunk.css',
     }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, 'public', 'index.html'),
@@ -67,7 +67,7 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
-        test: /\.s[ac]ss$/i,
+        test: /\.s[ac]ss$/,
         use: [
           {
             loader: MiniCssExtractPlugin.loader,
@@ -96,7 +96,7 @@ module.exports = {
           },
         ],
       },
-    ]
+    ],
   },
   optimization: {
     splitChunks: {
