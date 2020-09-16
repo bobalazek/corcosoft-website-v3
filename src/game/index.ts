@@ -6,6 +6,8 @@ import {
   CubeTexture,
   SceneLoader,
   Animation,
+  Axis,
+  Space,
   Matrix,
   Quaternion,
   Vector3,
@@ -33,13 +35,14 @@ let scene = new Scene(engine);
 scene.clearColor = new Color4(0, 0, 0, 0);
 
 let environmentTexture = CubeTexture.CreateFromPrefilteredData(
-  'static/media/textures/environment.dds',
+  //'static/media/textures/environment.dds',
+  'https://assets.babylonjs.com/environments/studio.env',
   scene
 );
 scene.environmentTexture = environmentTexture;
 
 // Game - Scene - Debug
-//scene.debugLayer.show({ overlay: true });
+// scene.debugLayer.show({ overlay: true });
 
 // Game - Scene - Camera
 let camera = new UniversalCamera(
@@ -53,23 +56,26 @@ camera.lockedTarget = new Vector3(0, 0, 0);
 let character: AbstractMesh = null;
 let characterFinalPosition = new Vector3();
 let characterFinalRotationQuaternion = new Quaternion();
+let characterLastFinalPositionChange = (new Date()).getTime();
 
-prepareCharacter();
+characterPrepare();
 
 /********** Game - Render loop **********/
 engine.runRenderLoop(() => {
   if (character) {
-    calculateCharacterRotation();
+    const deltaTime = engine.getDeltaTime();
+
+    characterTick(deltaTime);
 
     character.position = Vector3.Lerp(
       character.position,
       characterFinalPosition,
-      engine.getDeltaTime() * CHARACTER_POSITION_SMOOOTHING
+      deltaTime * CHARACTER_POSITION_SMOOOTHING
     );
     character.rotationQuaternion = Quaternion.Slerp(
       character.rotationQuaternion,
       characterFinalRotationQuaternion,
-      engine.getDeltaTime() * CHARACTER_ROTATION_SMOOOTHING
+      deltaTime * CHARACTER_ROTATION_SMOOOTHING
     );
   }
 
@@ -83,17 +89,28 @@ window.addEventListener('resize', () => {
 });
 
 window.addEventListener('mousemove', (e) => {
-  calculateCharacterPosition(e.clientX, e.clientY);
+  characterCalculatePosition(e.clientX, e.clientY);
 });
 
+setInterval(() => {
+  const now = (new Date()).getTime();
+  if (now - characterLastFinalPositionChange > 3000) {
+    characterMoveToRandomPosition();
+  }
+}, 1000);
+
 /********** Game - Functions **********/
-function prepareCharacter() {
+function characterPrepare() {
   SceneLoader.LoadAssetContainer('/static/media/models/', 'bot.glb', scene, function (container) {
     container.addAllToScene();
 
     character = scene.getMeshByID('__root__');
     character.id = character.name = 'CorcobotWrapper';
     character.position = new Vector3(0, 10, 0);
+
+    const characterFaceShieldMaterial = scene.getMaterialByID('Face_Shield');
+    characterFaceShieldMaterial.transparencyMode = 2;
+    characterFaceShieldMaterial.alpha = 0;
 
     Animation.CreateAndStartAnimation(
       'CorcobotWrapperScale',
@@ -108,21 +125,14 @@ function prepareCharacter() {
   });
 }
 
-function calculateCharacterPosition(screenX, screenY) {
-  const pickResult = scene.pick(screenX, screenY);
-  characterFinalPosition = new Vector3(
-    pickResult.ray.origin.x + pickResult.ray.direction.x * CAMERA_DISTANCE,
-    pickResult.ray.origin.y + pickResult.ray.direction.y * CAMERA_DISTANCE,
-    pickResult.ray.origin.z + pickResult.ray.direction.z * CAMERA_DISTANCE
-  );
-}
+function characterTick(deltaTime: number) {
+  const now = (new Date()).getTime();
 
-// https://stackoverflow.com/a/51170230/4642875
-function calculateCharacterRotation() {
-  const from = character.position;
-  const to = characterFinalPosition;
-
-  const distance = Vector3.DistanceSquared(to, from);
+  // Rotation
+  // https://stackoverflow.com/a/51170230/4642875
+  const from: Vector3 = character.position;
+  const to: Vector3 = characterFinalPosition;
+  const distance: number = Vector3.DistanceSquared(to, from);
   const direction: Vector3 = to.subtract(from).normalize();
 
   let rotationAxis: Vector3 = (Vector3.Forward()).cross(direction).normalize();
@@ -131,12 +141,40 @@ function calculateCharacterRotation() {
   }
 
   const dot: number = Vector3.Dot(Vector3.Forward(), direction);
-  const angle = Math.acos(dot);
+  const angle: number = Math.acos(dot);
 
   characterFinalRotationQuaternion = Quaternion.RotationAxis(rotationAxis, angle);
 
-  // TODO: smoother transition - crossmultiply?
-  if (distance < 2) {
+  if (distance < 3) {
     characterFinalRotationQuaternion = Quaternion.FromEulerAngles(0, Math.PI, 0);
   }
+
+  // Levitation
+  const characterInner = scene.getTransformNodeByID('Character');
+  if (characterInner) {
+    characterInner.position.y = Math.sin(now * 0.002) * 0.2;
+  }
+
+  // Propeller
+  const properllerMesh = scene.getTransformNodeByID('PropellerBone');
+  if (properllerMesh) {
+    properllerMesh.rotate(Axis.Y, (0.01 * distance) + 0.1);
+  }
+}
+
+function characterMoveToRandomPosition() {
+  characterCalculatePosition(
+    window.innerWidth * Math.random() * 0.8,
+    window.innerHeight * Math.random() * 0.8
+  );
+}
+
+function characterCalculatePosition(screenX, screenY) {
+  const pickResult = scene.pick(screenX, screenY);
+  characterFinalPosition = new Vector3(
+    pickResult.ray.origin.x + pickResult.ray.direction.x * CAMERA_DISTANCE,
+    pickResult.ray.origin.y + pickResult.ray.direction.y * CAMERA_DISTANCE,
+    pickResult.ray.origin.z + pickResult.ray.direction.z * CAMERA_DISTANCE
+  );
+  characterLastFinalPositionChange = (new Date()).getTime();
 }
