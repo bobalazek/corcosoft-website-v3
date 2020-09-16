@@ -102,6 +102,7 @@ window.addEventListener('mousemove', (e) => {
 });
 
 // Game - Functions
+// https://stackoverflow.com/a/51170230/4642875
 function lookAt(from: Vector3, to: Vector3, front: Vector3, up: Vector3) {
   const direction: Vector3 = from.subtract(to).normalize();
   let rotationAxis: Vector3 = from.cross(direction).normalize();
