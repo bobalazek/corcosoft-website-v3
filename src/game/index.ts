@@ -7,6 +7,7 @@ import {
   SceneLoader,
   Animation,
   Quaternion,
+  Axis,
   Vector3,
   Color4,
 } from 'babylonjs';
@@ -15,6 +16,8 @@ import 'babylonjs-loaders';
 // Constants
 const CAMERA_DISTANCE = 25;
 const CHARACTER_POSITION_SMOOOTHING = 0.002;
+const WORLD_FORWARD = new Vector3(0, 0, 1);
+const WORLD_UP = new Vector3(0, 1, 0);
 
 // CSS
 import './css/index.scss';
@@ -80,7 +83,12 @@ engine.runRenderLoop(() => {
       engine.getDeltaTime() * CHARACTER_POSITION_SMOOOTHING
     );
 
-    // TODO: rotate towards direction
+    character.rotationQuaternion = lookAt(
+      character.position,
+      characterFinalPosition,
+      WORLD_FORWARD,
+      WORLD_UP
+    );
   }
 
   // Render
@@ -104,13 +112,15 @@ window.addEventListener('mousemove', (e) => {
 // Game - Functions
 // https://stackoverflow.com/a/51170230/4642875
 function lookAt(from: Vector3, to: Vector3, front: Vector3, up: Vector3) {
-  const direction: Vector3 = from.subtract(to).normalize();
-  let rotationAxis: Vector3 = from.cross(direction).normalize();
+  const direction: Vector3 = to.subtract(from).normalize();
+
+  let rotationAxis: Vector3 = front.cross(direction).normalize();
   if (rotationAxis.lengthSquared() === 0) {
     rotationAxis = up;
   }
 
-  const angle: number = Vector3.Dot(Vector3.Forward(), direction);
+  const dot: number = Vector3.Dot(Vector3.Forward(), direction);
+  const angle = Math.acos(dot);
 
   return Quaternion.RotationAxis(rotationAxis, angle);
 }
