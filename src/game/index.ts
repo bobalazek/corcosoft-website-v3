@@ -1,14 +1,15 @@
 import {
   Engine,
   Scene,
+  AbstractMesh,
   UniversalCamera,
-  MeshBuilder,
   PBRMetallicRoughnessMaterial,
   CubeTexture,
   SceneLoader,
   Vector3,
   Color4,
 } from 'babylonjs';
+import 'babylonjs-loaders';
 
 // Constants
 const CAMERA_DISTANCE = 15;
@@ -34,7 +35,7 @@ var environmentTexture = CubeTexture.CreateFromPrefilteredData(
 );
 scene.environmentTexture = environmentTexture;
 
-//scene.debugLayer.show({ overlay: true });
+scene.debugLayer.show({ overlay: true });
 
 // Game - Scene - Camera
 let camera = new UniversalCamera(
@@ -51,27 +52,18 @@ let characterMaterial = new PBRMetallicRoughnessMaterial(
 );
 characterMaterial.environmentTexture = environmentTexture;
 
-let character = null;
-/*
-let character = MeshBuilder.CreateSphere(
-  'sphere',
-  {
-    diameter: 2,
-  },
-  scene
-);
-character.material = characterMaterial;
-*/
-
+let character: AbstractMesh = null;
 let characterFinalPosition = new Vector3();
 
 SceneLoader.LoadAssetContainer('/static/media/models/', 'bot.glb', scene, function (container) {
-  console.log(container)
-  let botMesh = container.scene.meshes[0];
+  container.addAllToScene();
 
-  scene.addMesh(botMesh);
+  character = scene.getMeshByID('__root__');
+  character.id = character.name = 'CorcobotWrapper';
 
-  botMesh.position = characterFinalPosition;
+  character.scaling = Vector3.Zero();
+
+  // TODO: animate scale
 });
 
 // Game - Render loop
