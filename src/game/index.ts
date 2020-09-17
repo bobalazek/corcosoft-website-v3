@@ -15,6 +15,10 @@ import {
 } from 'babylonjs';
 import 'babylonjs-loaders';
 
+// Asset imports
+import botModel from './assets/models/bot.glb';
+import environmentTexture from './assets/textures/environment.env';
+
 // Constants
 const CAMERA_DISTANCE = 25;
 const CHARACTER_POSITION_SMOOOTHING = 0.002;
@@ -34,11 +38,11 @@ const engine = new Engine(
 let scene = new Scene(engine);
 scene.clearColor = new Color4(0, 0, 0, 0);
 
-let environmentTexture = CubeTexture.CreateFromPrefilteredData(
-  'static/media/textures/environment.env',
+let environmentCubeTexture = CubeTexture.CreateFromPrefilteredData(
+  environmentTexture,
   scene
 );
-scene.environmentTexture = environmentTexture;
+scene.environmentTexture = environmentCubeTexture;
 
 // Game - Scene - Debug
 // scene.debugLayer.show({ overlay: true });
@@ -100,33 +104,37 @@ setInterval(() => {
 
 /********** Game - Functions **********/
 function characterPrepare() {
-  SceneLoader.LoadAssetContainer('/static/media/models/', 'bot.glb', scene, function (container) {
-    container.addAllToScene();
+  const importResult = SceneLoader.ImportMesh(
+    '',
+    '',
+    botModel,
+    scene,
+    function() {
+      character = scene.getMeshByID('__root__');
+      character.id = character.name = 'CorcobotWrapper';
+      character.position = new Vector3(0, 10, 0);
 
-    character = scene.getMeshByID('__root__');
-    character.id = character.name = 'CorcobotWrapper';
-    character.position = new Vector3(0, 10, 0);
+      // Face shield material fix
+      const characterFaceShieldMaterial = scene.getMaterialByID('Face_Shield');
+      characterFaceShieldMaterial.transparencyMode = 2;
+      characterFaceShieldMaterial.alpha = 0;
 
-    // Face shield material fix
-    const characterFaceShieldMaterial = scene.getMaterialByID('Face_Shield');
-    characterFaceShieldMaterial.transparencyMode = 2;
-    characterFaceShieldMaterial.alpha = 0;
+      // Propeller bone fix
+      const properllerBone = scene.getBoneByID('PropellerBone');
+      properllerBone.linkTransformNode(null);
 
-    // Propeller bone fix
-    const properllerBone = scene.getBoneByID('PropellerBone');
-    properllerBone.linkTransformNode(null);
-
-    Animation.CreateAndStartAnimation(
-      'CorcobotWrapperScale',
-      character,
-      'scaling',
-      60,
-      300,
-      Vector3.Zero(),
-      Vector3.One(),
-      Animation.ANIMATIONLOOPMODE_CONSTANT
-    );
-  });
+      Animation.CreateAndStartAnimation(
+        'CorcobotWrapperScale',
+        character,
+        'scaling',
+        60,
+        300,
+        Vector3.Zero(),
+        Vector3.One(),
+        Animation.ANIMATIONLOOPMODE_CONSTANT
+      );
+    }
+  );
 }
 
 function characterTick(deltaTime: number) {

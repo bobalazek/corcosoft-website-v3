@@ -11,7 +11,7 @@ module.exports = {
   },
   output: {
     filename: 'static/js/[name].[hash:8].js',
-    chunkFilename: 'static/js/[name].chunk.js',
+    chunkFilename: 'static/js/[name].[hash:8].chunk.js',
     path: path.resolve(__dirname, 'build'),
   },
   devtool: 'source-map',
@@ -55,7 +55,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
+        test: /\.tsx?$/i,
         loader: 'ts-loader',
         options: {
           compilerOptions: {
@@ -66,20 +66,11 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
-        test: /\.s[ac]ss$/,
+        test: /\.s[ac]ss$/i,
         use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-          },
-          // In case you want inline styles
-          /*
-          {
-            loader: 'style-loader',
-          },
-          */
-          {
-            loader: 'css-loader',
-          },
+          { loader: MiniCssExtractPlugin.loader },
+          // { loader: 'style-loader' }, // for inline styles
+          { loader: 'css-loader' },
           {
             loader: 'postcss-loader',
             options: {
@@ -90,8 +81,18 @@ module.exports = {
               },
             },
           },
+          { loader: 'sass-loader' },
+        ],
+      },
+      {
+        test: /\.(jpg|png|gif|env|dds|glb|gltf|stl)$/i,
+        use: [
           {
-            loader: 'sass-loader',
+            loader: 'url-loader',
+            options: {
+              limit: false,
+              name: 'static/media/[name].[hash].[ext]',
+            },
           },
         ],
       },

@@ -22,7 +22,7 @@ module.exports = merge(common, {
   },
   plugins: [
     new CompressionWebpackPlugin({
-      test: /\.(css|js|svg|ttf|eot|woff|woff2)$/,
+      test: /\.(css|js|svg|ttf|eot|woff|woff2)$/i,
     }),
     new PurgecssPlugin({
       paths: glob.sync(
@@ -31,6 +31,9 @@ module.exports = merge(common, {
           nodir: true,
         }
       ),
+      whitelistPatterns: [
+        /animation--.*/, // is added by jQuery on the fly
+      ],
     }),
     new CleanWebpackPlugin(),
   ],
