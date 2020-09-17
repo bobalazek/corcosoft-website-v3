@@ -8,7 +8,6 @@ import {
   Animation,
   Axis,
   Space,
-  Matrix,
   Quaternion,
   Vector3,
   Color4,
@@ -20,9 +19,11 @@ import botModel from './assets/models/bot.glb';
 import environmentTexture from './assets/textures/environment.env';
 
 // Constants
+const ENABLE_DEBUG = false;
 const CAMERA_DISTANCE = 25;
 const CHARACTER_POSITION_SMOOOTHING = 0.002;
 const CHARACTER_ROTATION_SMOOOTHING = 0.002;
+const CHARACTER_RANDOM_POSITION_MOVE_INTERVAL = 5000;
 
 // CSS
 import './css/index.scss';
@@ -45,7 +46,9 @@ let environmentCubeTexture = CubeTexture.CreateFromPrefilteredData(
 scene.environmentTexture = environmentCubeTexture;
 
 // Game - Scene - Debug
-// scene.debugLayer.show({ overlay: true });
+if (ENABLE_DEBUG) {
+  scene.debugLayer.show({ overlay: true });
+}
 
 // Game - Scene - Camera
 let camera = new UniversalCamera(
@@ -57,9 +60,7 @@ camera.lockedTarget = new Vector3(0, 0, 0);
 
 // Game - Scene - Character
 let character: AbstractMesh = null;
-let characterFinalPosition = new Vector3();
-let characterFinalRotationQuaternion = new Quaternion();
-let characterLastFinalPositionChange = (new Date()).getTime();
+let characterLastPositionChange = (new Date()).getTime();
 
 characterPrepare();
 
@@ -72,12 +73,12 @@ engine.runRenderLoop(() => {
 
     character.position = Vector3.Lerp(
       character.position,
-      characterFinalPosition,
+      character.metadata.positionFinal,
       deltaTime * CHARACTER_POSITION_SMOOOTHING
     );
     character.rotationQuaternion = Quaternion.Slerp(
       character.rotationQuaternion,
-      characterFinalRotationQuaternion,
+      character.metadata.rotationQuaternionFinal,
       deltaTime * CHARACTER_ROTATION_SMOOOTHING
     );
   }
@@ -97,7 +98,7 @@ window.addEventListener('mousemove', (e) => {
 
 setInterval(() => {
   const now = (new Date()).getTime();
-  if (now - characterLastFinalPositionChange > 3000) {
+  if (now - characterLastPositionChange > CHARACTER_RANDOM_POSITION_MOVE_INTERVAL) {
     characterMoveToRandomPosition();
   }
 }, 1000);
@@ -113,15 +114,20 @@ function characterPrepare() {
       character = scene.getMeshByID('__root__');
       character.id = character.name = 'CorcobotWrapper';
       character.position = new Vector3(0, 10, 0);
+      character.metadata = {
+        positionFinal: new Vector3(),
+        rotationQuaternionFinal: new Vector3(),
+      };
 
       // Face shield material fix
       const characterFaceShieldMaterial = scene.getMaterialByID('Face_Shield');
       characterFaceShieldMaterial.transparencyMode = 2;
       characterFaceShieldMaterial.alpha = 0;
 
-      // Propeller bone fix
-      const properllerBone = scene.getBoneByID('PropellerBone');
-      properllerBone.linkTransformNode(null);
+      // Fix, so bones can be moved manually
+      scene.getBoneByID('PropellerBone').linkTransformNode(null);
+      scene.getBoneByID('ArmBone.L').linkTransformNode(null);
+      scene.getBoneByID('ArmBone.R').linkTransformNode(null);
 
       Animation.CreateAndStartAnimation(
         'CorcobotWrapperScale',
@@ -143,7 +149,7 @@ function characterTick(deltaTime: number) {
   // Rotation
   // https://stackoverflow.com/a/51170230/4642875
   const from: Vector3 = character.position;
-  const to: Vector3 = characterFinalPosition;
+  const to: Vector3 = character.metadata.positionFinal;
   const distance: number = Vector3.DistanceSquared(to, from);
   const direction: Vector3 = to.subtract(from).normalize();
 
@@ -155,23 +161,20 @@ function characterTick(deltaTime: number) {
   const dot: number = Vector3.Dot(Vector3.Forward(), direction);
   const angle: number = Math.acos(dot);
 
-  characterFinalRotationQuaternion = Quaternion.RotationAxis(rotationAxis, angle);
-
-  if (distance < 3) {
-    characterFinalRotationQuaternion = Quaternion.FromEulerAngles(0, Math.PI, 0);
-  }
+  character.metadata.rotationQuaternionFinal = distance < 3
+    ? Quaternion.FromEulerAngles(0, Math.PI, 0)
+    : Quaternion.RotationAxis(rotationAxis, angle);
 
   // Levitation
   const characterInner = scene.getTransformNodeByID('Character');
-  if (characterInner) {
-    characterInner.position.y = Math.sin(now * 0.002) * 0.2;
-  }
+  characterInner.position.y = Math.sin(now * 0.002) * 0.3;
 
-  // Propeller
+  // Propeller spinning
   const properllerBone = scene.getBoneByID('PropellerBone');
-  if (properllerBone) {
-    properllerBone.rotate(Axis.Y, (0.01 * distance) + 0.1);
-  }
+  properllerBone.rotate(Axis.Y, (0.01 * distance) + 0.1);
+
+  // Arm rotation
+  // TODO: move arm towards the direction it flies
 }
 
 function characterMoveToRandomPosition() {
@@ -182,11 +185,15 @@ function characterMoveToRandomPosition() {
 }
 
 function characterCalculatePosition(screenX, screenY) {
+  if (!character) {
+    return;
+  }
+
   const pickResult = scene.pick(screenX, screenY);
-  characterFinalPosition = new Vector3(
+  character.metadata.positionFinal = new Vector3(
     pickResult.ray.origin.x + pickResult.ray.direction.x * CAMERA_DISTANCE,
     pickResult.ray.origin.y + pickResult.ray.direction.y * CAMERA_DISTANCE,
     pickResult.ray.origin.z + pickResult.ray.direction.z * CAMERA_DISTANCE
   );
-  characterLastFinalPositionChange = (new Date()).getTime();
+  characterLastPositionChange = (new Date()).getTime();
 }
