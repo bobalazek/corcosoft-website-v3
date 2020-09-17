@@ -1,7 +1,6 @@
 /***** Dependencies *****/
-/* Bootstrap */
-@import "~bootstrap/scss/bootstrap";
-@import "~animate.css";
+@import "~bootstrap/scss/bootstrap-reboot";
+@import "~bootstrap/scss/bootstrap-grid";
 
 /***** General *****/
 body {
@@ -35,17 +34,81 @@ ul li:last-child {
   visibility: hidden;
 }
 
+h1,
+h2 {
+  line-height: 1;
+}
+
 h1 span,
 h2 span {
+  font-weight: 500;
   display: inline-block;
 }
 
 /*** Header ***/
 header {
   margin-top: 1.5em;
+  text-align: center;
 }
 
 /*** Footer ***/
 footer {
   color: #999;
+
+  .footer-location {
+    text-align: right;
+  }
+}
+
+/********** Animations **********/
+.animation {
+  -webkit-animation-duration: 1s;
+  animation-duration: 1s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
+
+@-webkit-keyframes slideDownAnimation {
+  0% {
+    -webkit-transform: translateY(-1200px) scale(0.7);
+    transform: translateY(-1200px) scale(0.7);
+    opacity: 0.7;
+  }
+
+  80% {
+    -webkit-transform: translateY(0px) scale(0.7);
+    transform: translateY(0px) scale(0.7);
+    opacity: 0.7;
+  }
+
+  100% {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slideDownAnimation {
+  0% {
+    -webkit-transform: translateY(-1200px) scale(0.7);
+    transform: translateY(-1200px) scale(0.7);
+    opacity: 0.7;
+  }
+
+  80% {
+    -webkit-transform: translateY(0px) scale(0.7);
+    transform: translateY(0px) scale(0.7);
+    opacity: 0.7;
+  }
+
+  100% {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animation--slideDownAnimation {
+  -webkit-animation-name: slideDownAnimation;
+  animation-name: slideDownAnimation;
 }

@@ -35,8 +35,7 @@ let scene = new Scene(engine);
 scene.clearColor = new Color4(0, 0, 0, 0);
 
 let environmentTexture = CubeTexture.CreateFromPrefilteredData(
-  //'static/media/textures/environment.dds',
-  'https://assets.babylonjs.com/environments/studio.env',
+  'static/media/textures/environment.env',
   scene
 );
 scene.environmentTexture = environmentTexture;
@@ -108,9 +107,14 @@ function characterPrepare() {
     character.id = character.name = 'CorcobotWrapper';
     character.position = new Vector3(0, 10, 0);
 
+    // Face shield material fix
     const characterFaceShieldMaterial = scene.getMaterialByID('Face_Shield');
     characterFaceShieldMaterial.transparencyMode = 2;
     characterFaceShieldMaterial.alpha = 0;
+
+    // Propeller bone fix
+    const properllerBone = scene.getBoneByID('PropellerBone');
+    properllerBone.linkTransformNode(null);
 
     Animation.CreateAndStartAnimation(
       'CorcobotWrapperScale',
@@ -156,9 +160,9 @@ function characterTick(deltaTime: number) {
   }
 
   // Propeller
-  const properllerMesh = scene.getTransformNodeByID('PropellerBone');
-  if (properllerMesh) {
-    properllerMesh.rotate(Axis.Y, (0.01 * distance) + 0.1);
+  const properllerBone = scene.getBoneByID('PropellerBone');
+  if (properllerBone) {
+    properllerBone.rotate(Axis.Y, (0.01 * distance) + 0.1);
   }
 }
 
