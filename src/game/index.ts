@@ -7,6 +7,7 @@ import {
   SceneLoader,
   Animation,
   Axis,
+  Scalar,
   Quaternion,
   Vector3,
   Color4,
@@ -148,6 +149,13 @@ function characterPrepare() {
 function characterUpdate(deltaTime: number) {
   const now = (new Date()).getTime();
 
+  // Prevent deltaTime to be too high, like, for example if you switch to another window,
+  //   and then after XX seconds come back to this window. This would cause the character
+  //   to not move at all, as the Lerp value would be a very low number
+  const time = deltaTime > 1000
+    ? 0.001 // 1 / 1000
+    : 1 / deltaTime;
+
   /********** Calculations **********/
   // Rotation
   // https://stackoverflow.com/a/51170230/4642875
@@ -187,26 +195,37 @@ function characterUpdate(deltaTime: number) {
   properllerBone.rotate(Axis.Y, (0.01 * distance) + 0.1);
 
   // Character - Arm rotation
+  const armBoneLerpValue = Scalar.SmoothStep(
+    0,
+    1,
+    Scalar.Clamp(distance / 10, 0, 1)
+  );
+
   const armLBone = scene.getBoneByID('ArmBone.L');
-  armLBone.setYawPitchRoll(
-    armLBone.metadata.rotationInitial.x,
-    armLBone.metadata.rotationInitial.y + direction.y * Math.PI / 2,
-    armLBone.metadata.rotationInitial.z
+  armLBone.setRotationQuaternion(
+    Vector3.Lerp(
+      armLBone.metadata.rotationInitial,
+      new Vector3(
+        armLBone.metadata.rotationInitial.x + (direction.y * Math.PI / 2),
+        armLBone.metadata.rotationInitial.y,
+        armLBone.metadata.rotationInitial.z
+      ),
+      armBoneLerpValue
+    ).toQuaternion()
   );
 
   const armRBone = scene.getBoneByID('ArmBone.R');
-  armRBone.setYawPitchRoll(
-    armRBone.metadata.rotationInitial.x,
-    armRBone.metadata.rotationInitial.y + direction.y * Math.PI / 2,
-    armRBone.metadata.rotationInitial.z
+  armRBone.setRotationQuaternion(
+    Vector3.Lerp(
+      armRBone.metadata.rotationInitial,
+      new Vector3(
+        armRBone.metadata.rotationInitial.x + (direction.y * Math.PI / 2),
+        armRBone.metadata.rotationInitial.y,
+        armRBone.metadata.rotationInitial.z
+      ),
+      armBoneLerpValue
+    ).toQuaternion()
   );
-
-  // Prevent deltaTime to be too high, like, for example if you switch to another window,
-  //   and then after XX seconds come back to this window. This would cause the character
-  //   to not move at all, as the Lerp value would be a very low number
-  const time = deltaTime > 1000
-    ? 0.001 // 1 / 1000
-    : 1 / deltaTime;
 
   // Character - Position
   character.position = Vector3.Lerp(
