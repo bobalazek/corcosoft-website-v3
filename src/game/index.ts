@@ -22,7 +22,7 @@ import environmentTexture from './assets/textures/environment.env';
 const ENABLE_DEBUG = false;
 const CAMERA_DISTANCE = 25;
 const CHARACTER_POSITION_SMOOOTHING = 0.3;
-const CHARACTER_ROTATION_SMOOOTHING = 0.3;
+const CHARACTER_ROTATION_SMOOOTHING = 0.5;
 const CHARACTER_RANDOM_POSITION_MOVE_INTERVAL = 5000;
 
 // CSS
@@ -163,29 +163,36 @@ function characterUpdate(deltaTime: number) {
   character.metadata.rotationQuaternionFinal = rotationQuaternionFinal;
 
   /********** Movement & rotation **********/
-  // Character - levitation
+  // Character - Levitation
   const characterInner = scene.getTransformNodeByID('Character');
   characterInner.position.y = Math.sin(now * 0.002) * 0.3;
 
-  // Character - propeller spinning
+  // Character - Propeller spinning
   const properllerBone = scene.getBoneByID('PropellerBone');
   properllerBone.rotate(Axis.Y, (0.01 * distance) + 0.1);
 
-  // Character - arm rotation
+  // Character - Arm rotation
   // TODO: move arm towards the direction it flies
 
-  // Character - position
+  // Prevent deltaTime to be too high, like, for example if you switch to another window,
+  //   and then after XXX seconds come back to this window. This would cause the character
+  //   to jump out of the viewport too much, as (1 / 100000) is really low make the intepolation
+  const time = deltaTime > 1000
+    ? 0.001 // 1 / 1000
+    : 1 / deltaTime;
+
+  // Character - Position
   character.position = Vector3.Lerp(
     character.position,
     character.metadata.positionFinal,
-    (1 / deltaTime) * CHARACTER_POSITION_SMOOOTHING
+    time * CHARACTER_POSITION_SMOOOTHING
   );
 
-  // Character - rotation
+  // Character - Rotation
   character.rotationQuaternion = Quaternion.Slerp(
     character.rotationQuaternion,
     character.metadata.rotationQuaternionFinal,
-    (1 / deltaTime) * CHARACTER_ROTATION_SMOOOTHING
+    time * CHARACTER_ROTATION_SMOOOTHING
   );
 }
 
