@@ -1,9 +1,11 @@
 const path = require('path');
+const glob = require('glob');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
+const PurgecssPlugin = require('purgecss-webpack-plugin');
 
 module.exports = {
   entry: {
@@ -50,6 +52,17 @@ module.exports = {
           ),
         };
       },
+    }),
+    new PurgecssPlugin({
+      paths: glob.sync(
+        path.resolve(__dirname, '**', '*'),
+        {
+          nodir: true,
+        }
+      ),
+      whitelistPatterns: [
+        /animation--.*/, // is added by jQuery on the fly
+      ],
     }),
   ],
   module: {

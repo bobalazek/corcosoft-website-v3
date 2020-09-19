@@ -161,9 +161,18 @@ function characterTick(deltaTime: number) {
   const dot: number = Vector3.Dot(Vector3.Forward(), direction);
   const angle: number = Math.acos(dot);
 
-  character.metadata.rotationQuaternionFinal = distance < 3
-    ? Quaternion.FromEulerAngles(0, Math.PI, 0)
-    : Quaternion.RotationAxis(rotationAxis, angle);
+  let rotationQuaternionFinal: Quaternion = Quaternion.RotationAxis(rotationAxis, angle);
+
+  // Smoother transition for the final, "look towards us" position
+  if (distance < 10) {
+    rotationQuaternionFinal = Quaternion.Slerp(
+      rotationQuaternionFinal,
+      Quaternion.FromEulerAngles(0, Math.PI, 0),
+      1 - (distance / 10)
+    );
+  }
+
+  character.metadata.rotationQuaternionFinal = rotationQuaternionFinal;
 
   // Levitation
   const characterInner = scene.getTransformNodeByID('Character');
