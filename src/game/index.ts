@@ -7,7 +7,6 @@ import {
   SceneLoader,
   Animation,
   Axis,
-  Space,
   Quaternion,
   Vector3,
   Color4,
@@ -66,11 +65,6 @@ characterPrepare();
 
 /********** Game - Render loop **********/
 engine.runRenderLoop(() => {
-  if (character) {
-    characterUpdate(engine.getDeltaTime());
-  }
-
-  // Render
   scene.render();
 });
 
@@ -111,11 +105,28 @@ function characterPrepare() {
       characterFaceShieldMaterial.transparencyMode = 2;
       characterFaceShieldMaterial.alpha = 0;
 
-      // Fix, so bones can be moved manually
-      scene.getBoneByID('PropellerBone').linkTransformNode(null);
-      scene.getBoneByID('ArmBone.L').linkTransformNode(null);
-      scene.getBoneByID('ArmBone.R').linkTransformNode(null);
+      // Fix, so bones can be moved manually, because in GLTF the transform moves the bone,
+      //   not vice-versa. Also, set some metadata for the arms, so we can later use it
+      //   for the rotation.
+      // Propeller
+      const propellerBone = scene.getBoneByID('PropellerBone');
+      propellerBone.linkTransformNode(null);
 
+      // Arm - Left
+      const armLBone = scene.getBoneByID('ArmBone.L');
+      armLBone.linkTransformNode(null);
+      armLBone.metadata = {
+        rotateionQuaternionInitial: armLBone.rotationQuaternion.clone(),
+      };
+
+      // Arm - Right
+      const armRBone = scene.getBoneByID('ArmBone.R');
+      armRBone.linkTransformNode(null);
+      armRBone.metadata = {
+        rotateionQuaternionInitial: armRBone.rotationQuaternion.clone(),
+      };
+
+      // Animate our character in
       Animation.CreateAndStartAnimation(
         'CorcobotWrapperScale',
         character,
@@ -126,6 +137,10 @@ function characterPrepare() {
         Vector3.One(),
         Animation.ANIMATIONLOOPMODE_CONSTANT
       );
+
+      scene.onBeforeRenderObservable.add(() => {
+        characterUpdate(engine.getDeltaTime());
+      });
     }
   );
 }
@@ -175,8 +190,8 @@ function characterUpdate(deltaTime: number) {
   // TODO: move arm towards the direction it flies
 
   // Prevent deltaTime to be too high, like, for example if you switch to another window,
-  //   and then after XXX seconds come back to this window. This would cause the character
-  //   to jump out of the viewport too much, as (1 / 100000) is really low make the intepolation
+  //   and then after XX seconds come back to this window. This would cause the character
+  //   to not move at all, as the Lerp value would be a very low number
   const time = deltaTime > 1000
     ? 0.001 // 1 / 1000
     : 1 / deltaTime;
