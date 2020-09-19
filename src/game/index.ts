@@ -116,14 +116,14 @@ function characterPrepare() {
       const armLBone = scene.getBoneByID('ArmBone.L');
       armLBone.linkTransformNode(null);
       armLBone.metadata = {
-        rotateionQuaternionInitial: armLBone.rotationQuaternion.clone(),
+        rotationInitial: armLBone.rotation.clone(),
       };
 
       // Arm - Right
       const armRBone = scene.getBoneByID('ArmBone.R');
       armRBone.linkTransformNode(null);
       armRBone.metadata = {
-        rotateionQuaternionInitial: armRBone.rotationQuaternion.clone(),
+        rotationInitial: armRBone.rotation.clone(),
       };
 
       // Animate our character in
@@ -187,7 +187,19 @@ function characterUpdate(deltaTime: number) {
   properllerBone.rotate(Axis.Y, (0.01 * distance) + 0.1);
 
   // Character - Arm rotation
-  // TODO: move arm towards the direction it flies
+  const armLBone = scene.getBoneByID('ArmBone.L');
+  armLBone.setYawPitchRoll(
+    armLBone.metadata.rotationInitial.x,
+    armLBone.metadata.rotationInitial.y + direction.y,
+    armLBone.metadata.rotationInitial.z
+  );
+
+  const armRBone = scene.getBoneByID('ArmBone.R');
+  armRBone.setYawPitchRoll(
+    armRBone.metadata.rotationInitial.x,
+    armRBone.metadata.rotationInitial.y + direction.y,
+    armRBone.metadata.rotationInitial.z
+  );
 
   // Prevent deltaTime to be too high, like, for example if you switch to another window,
   //   and then after XX seconds come back to this window. This would cause the character
