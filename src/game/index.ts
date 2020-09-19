@@ -190,14 +190,14 @@ function characterUpdate(deltaTime: number) {
   const armLBone = scene.getBoneByID('ArmBone.L');
   armLBone.setYawPitchRoll(
     armLBone.metadata.rotationInitial.x,
-    armLBone.metadata.rotationInitial.y + direction.y,
+    armLBone.metadata.rotationInitial.y + direction.y * Math.PI / 2,
     armLBone.metadata.rotationInitial.z
   );
 
   const armRBone = scene.getBoneByID('ArmBone.R');
   armRBone.setYawPitchRoll(
     armRBone.metadata.rotationInitial.x,
-    armRBone.metadata.rotationInitial.y + direction.y,
+    armRBone.metadata.rotationInitial.y + direction.y * Math.PI / 2,
     armRBone.metadata.rotationInitial.z
   );
 
