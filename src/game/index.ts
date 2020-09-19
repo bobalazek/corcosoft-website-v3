@@ -67,7 +67,7 @@ characterPrepare();
 /********** Game - Render loop **********/
 engine.runRenderLoop(() => {
   if (character) {
-    characterTick(engine.getDeltaTime());
+    characterUpdate(engine.getDeltaTime());
   }
 
   // Render
@@ -130,7 +130,7 @@ function characterPrepare() {
   );
 }
 
-function characterTick(deltaTime: number) {
+function characterUpdate(deltaTime: number) {
   const now = (new Date()).getTime();
 
   /********** Calculations **********/
