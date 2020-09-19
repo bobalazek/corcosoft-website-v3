@@ -21,8 +21,8 @@ import environmentTexture from './assets/textures/environment.env';
 // Constants
 const ENABLE_DEBUG = false;
 const CAMERA_DISTANCE = 25;
-const CHARACTER_POSITION_SMOOOTHING = 0.002;
-const CHARACTER_ROTATION_SMOOOTHING = 0.002;
+const CHARACTER_POSITION_SMOOOTHING = 0.3;
+const CHARACTER_ROTATION_SMOOOTHING = 0.3;
 const CHARACTER_RANDOM_POSITION_MOVE_INTERVAL = 5000;
 
 // CSS
@@ -67,20 +67,7 @@ characterPrepare();
 /********** Game - Render loop **********/
 engine.runRenderLoop(() => {
   if (character) {
-    const deltaTime = engine.getDeltaTime();
-
-    characterTick(deltaTime);
-
-    character.position = Vector3.Lerp(
-      character.position,
-      character.metadata.positionFinal,
-      deltaTime * CHARACTER_POSITION_SMOOOTHING
-    );
-    character.rotationQuaternion = Quaternion.Slerp(
-      character.rotationQuaternion,
-      character.metadata.rotationQuaternionFinal,
-      deltaTime * CHARACTER_ROTATION_SMOOOTHING
-    );
+    characterTick(engine.getDeltaTime());
   }
 
   // Render
@@ -146,6 +133,7 @@ function characterPrepare() {
 function characterTick(deltaTime: number) {
   const now = (new Date()).getTime();
 
+  /********** Calculations **********/
   // Rotation
   // https://stackoverflow.com/a/51170230/4642875
   const from: Vector3 = character.position;
@@ -174,16 +162,31 @@ function characterTick(deltaTime: number) {
 
   character.metadata.rotationQuaternionFinal = rotationQuaternionFinal;
 
-  // Levitation
+  /********** Movement & rotation **********/
+  // Character - levitation
   const characterInner = scene.getTransformNodeByID('Character');
   characterInner.position.y = Math.sin(now * 0.002) * 0.3;
 
-  // Propeller spinning
+  // Character - propeller spinning
   const properllerBone = scene.getBoneByID('PropellerBone');
   properllerBone.rotate(Axis.Y, (0.01 * distance) + 0.1);
 
-  // Arm rotation
+  // Character - arm rotation
   // TODO: move arm towards the direction it flies
+
+  // Character - position
+  character.position = Vector3.Lerp(
+    character.position,
+    character.metadata.positionFinal,
+    (1 / deltaTime) * CHARACTER_POSITION_SMOOOTHING
+  );
+
+  // Character - rotation
+  character.rotationQuaternion = Quaternion.Slerp(
+    character.rotationQuaternion,
+    character.metadata.rotationQuaternionFinal,
+    (1 / deltaTime) * CHARACTER_ROTATION_SMOOOTHING
+  );
 }
 
 function characterMoveToRandomPosition() {

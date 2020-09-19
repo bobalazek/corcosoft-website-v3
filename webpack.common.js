@@ -53,17 +53,17 @@ module.exports = {
         };
       },
     }),
-    new PurgecssPlugin({
-      paths: glob.sync(
-        path.resolve(__dirname, '**', '*'),
-        {
-          nodir: true,
-        }
-      ),
-      whitelistPatterns: [
-        /animation--.*/, // is added by jQuery on the fly
-      ],
-    }),
+//    new PurgecssPlugin({
+//      paths: glob.sync(
+//        path.resolve(__dirname, '**', '*'),
+//        {
+//          nodir: true,
+//        }
+//      ),
+//      whitelistPatterns: [
+//        /animation--.*/i, // is added by jQuery on the fly
+//      ],
+//    }),
   ],
   module: {
     rules: [
@@ -76,7 +76,7 @@ module.exports = {
             esModuleInterop: true,
           },
         },
-        exclude: /node_modules/,
+        exclude: /node_modules/i,
       },
       {
         test: /\.s[ac]ss$/i,
