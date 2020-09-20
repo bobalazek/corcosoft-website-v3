@@ -28,48 +28,18 @@ const CHARACTER_RANDOM_POSITION_MOVE_INTERVAL = 5000;
 // CSS
 import './css/index.scss';
 
-/********** Game **********/
-const canvas = <HTMLCanvasElement>document.getElementById('canvas');
-const engine = new Engine(
-  canvas,
-  true
-);
-
-/********** Game - Scene **********/
-let scene = new Scene(engine);
-scene.clearColor = new Color4(0, 0, 0, 0);
-
-let environmentCubeTexture = CubeTexture.CreateFromPrefilteredData(
-  environmentTexture,
-  scene
-);
-scene.environmentTexture = environmentCubeTexture;
-
-// Game - Scene - Debug
-if (ENABLE_DEBUG) {
-  scene.debugLayer.show({ overlay: true });
-}
-
-// Game - Scene - Camera
-let camera = new UniversalCamera(
-  'camera',
-  new Vector3(0, 0, -CAMERA_DISTANCE),
-  scene
-);
-camera.lockedTarget = new Vector3(0, 0, 0);
-
-// Game - Scene - Character
-let character: AbstractMesh = null;
+/********** Variables **********/
+let canvas: HTMLCanvasElement;
+let engine: Engine;
+let scene: Scene;
+let character: AbstractMesh;
 let characterLastPositionChange = (new Date()).getTime();
 
-characterPrepare();
-
-/********** Game - Render loop **********/
-engine.runRenderLoop(() => {
-  scene.render();
+/********** Events **********/
+window.addEventListener('DOMContentLoaded', () => {
+  gameInit();
 });
 
-/********** Game - Events **********/
 window.addEventListener('resize', () => {
   engine.resize();
 });
@@ -85,9 +55,48 @@ setInterval(() => {
   }
 }, 1000);
 
-/********** Game - Functions **********/
+/********** Functions **********/
+function gameInit() {
+  canvas = <HTMLCanvasElement>document.getElementById('canvas');
+  engine = new Engine(
+    canvas,
+    true
+  );
+
+  // Scene
+  scene = new Scene(engine);
+  scene.clearColor = new Color4(0, 0, 0, 0);
+
+  let environmentCubeTexture = CubeTexture.CreateFromPrefilteredData(
+    environmentTexture,
+    scene
+  );
+  scene.environmentTexture = environmentCubeTexture;
+
+  //  Scene - Debug
+  if (ENABLE_DEBUG) {
+    scene.debugLayer.show({ overlay: true });
+  }
+
+  //  Scene - Camera
+  let camera = new UniversalCamera(
+    'camera',
+    new Vector3(0, 0, -CAMERA_DISTANCE),
+    scene
+  );
+  camera.lockedTarget = new Vector3(0, 0, 0);
+
+  // Character - Prepare
+  characterPrepare();
+
+  // Render Loop
+  engine.runRenderLoop(() => {
+    scene.render();
+  });
+}
+
 function characterPrepare() {
-  const importResult = SceneLoader.ImportMesh(
+  SceneLoader.ImportMesh(
     '',
     '',
     botModel,
