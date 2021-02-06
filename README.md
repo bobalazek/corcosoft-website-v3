@@ -2,7 +2,7 @@
 
 ## Installation
 
-* To install dependencies, run: `yarn install`
+* Run: `yarn install`
 
 
 ## Development
